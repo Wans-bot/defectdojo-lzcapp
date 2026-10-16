@@ -1,0 +1,4 @@
+# 构建产物不进仓库：LPK 由 Action 构建并作为 Release Asset 发布
+dist/*.lpk
+dist/*-v*.lpk
+.lazycat-release.env

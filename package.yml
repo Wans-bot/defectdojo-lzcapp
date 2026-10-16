@@ -1,0 +1,239 @@
+name: DefectDojo
+description: 开源统一漏洞管理平台（DevSecOps / ASPM）：聚合各类扫描器的漏洞结果、自动去重、跟踪修复进度并输出统计报表
+package: cloud.lazycat.app.defectdojo
+version: 3.4.0-8
+author: DefectDojo
+license: BSD-3-Clause
+homepage: https://github.com/DefectDojo/django-DefectDojo
+min_os_version: 1.6.0
+support_mobile: true
+categories:
+  - 开发者工具
+permissions:
+  optional:
+    - net.internet
+locales:
+  zh-CN:
+    name: DefectDojo 漏洞管理平台
+    description: >-
+      开源统一漏洞管理平台（OWASP Flagship 项目）。把 Trivy / Semgrep / Nessus / Burp / ZAP /
+      SonarQube 等上百种扫描器的结果汇聚到一处，自动去重、按产品与版本跟踪修复状态、输出漏洞趋势与 SLA 报表，是 DevSecOps /
+      应用安全团队管理漏洞的标准工具
+    usage: >-
+      DefectDojo 是 OWASP 旗舰级的开源漏洞管理（Vulnerability Management /
+      ASPM）平台。扫描器负责「发现问题」，DefectDojo
+      负责「把问题管起来」：汇总结果、自动去重、分派负责人、跟踪修复状态、输出统计报表。本应用已由微服账号门禁保护，打开即进入 DefectDojo
+      界面。
+
+
+      【登录信息】
+
+      应用已内置管理员，打开应用会自动完成登录，无需手动输入账号密码。初始账号为 admin，初始密码为
+      DefectDojo@2026。首次进入后建议在右上角用户菜单 → 修改密码；改密码后自动登录会改用新密码，若自动登录未生效，可在登录页手动输入一次新账号密码。
+
+
+      【首次启动请稍候（重要）】
+
+      第一次启动时容器会自动做数据库迁移与初始化（建表 + 建管理员），实机实测约 2~5 分钟。这期间页面显示的是「DefectDojo
+      正在初始化」等待页并每 6
+      秒自动刷新，初始化完成后会自动进入登录页——不需要手动刷新，也不会出现报错页。初始化只在首次安装时执行，之后重启、升级都是秒级进入。
+
+
+      【一、先认识 4 个核心概念】
+
+      1. Product Type（产品类型）：最上层分组，如「Web 应用」「内部系统」。
+
+      2. Product（产品）：被评估的系统/项目，漏洞挂在它下面，可设置 SLA 与成员。
+
+      3. Engagement（评估活动）：一次安全测试/评估，有起止时间与类型（CI/CD、交互式等）。
+
+      4. Finding（漏洞）：一条具体漏洞，含严重级别、描述、复现步骤、修复状态、负责人。
+
+
+      【二、最快上手：导入一份扫描结果看效果（3 步）】
+
+      1. 左侧菜单 Products → Add Product，填名称（如「示例电商系统」）、选 Product Type，保存。
+
+      2. 进入该产品 → Engagements → Add Engagement，填名称与起止日期，保存。
+
+      3. 进入该 Engagement → Import Scan Result，选择扫描器类型（如 Trivy Scan、Semgrep
+      JSON、Nessus、Burp、ZAP 等 200+ 种），上传扫描报告文件，点 Import。导入后 Findings
+      页即可看到漏洞列表、严重级别分布与重复项合并结果。
+
+
+      【三、接入你自己的扫描器（CI/CD 自动化）】
+
+      1. 右上角用户菜单 → API v2 Key：生成 API Token（也可用 /api/v2/api-token-auth/ 用账号密码换取）。
+
+      2. 在 CI 流水线里调用上传接口，让扫描结果自动入库：
+         curl -X POST "https://<你的子域名>/api/v2/import-scan/" \
+           -H "Authorization: Token <API_TOKEN>" \
+           -F "scan_type=Trivy Scan" -F "file=@trivy-report.json" \
+           -F "engagement=<engagement_id>" -F "active=true" -F "verified=false"
+      3. 重复导入同一份报告：先去「配置 → 系统设置」把全局「启用去重」打开。开启后重复导入 不会把同一漏洞重复计数——DefectDojo
+      会按（产品 + 漏洞标题 + 组件 + 行号）算出相同的 哈希值，把后导入的那条标记为「重复」并关联到最早的那条主记录；在 Findings 列表里
+      默认只显示主记录，勾选过滤器「包含重复项」才看得到全部。这是实机验证过的行为（默认
+      该开关是关闭的，不打开的话同一份报告导两次会出现两条各算一次的漏洞）。
+
+      4. 扫描器类型清单见 Import Scan 页面的下拉框；拿不准格式时先看「Supported scan types」。
+
+
+      【四、看懂报表与指标】
+
+      - Dashboard：当前活跃漏洞总数、按严重级别（Critical/High/Medium/Low）分布、按产品分布。
+
+      - Metrics 页：漏洞新增/修复趋势曲线、按严重级别的历史变化、Top 风险产品。
+
+      - Product → Metrics：单个产品的漏洞年龄、SLA 达成情况、修复耗时。
+
+      - 全部列表页都支持导出 CSV（列表右上角 Export），方便归档与汇报。
+
+
+      【五、实用技巧】
+
+      1. 想批量清理测试数据：Findings 列表勾选后可用 Bulk Edit 统一改状态/负责人。
+
+      2. 误报请用 False Positive 标记（会从统计中剔除但仍留档），不要直接删除，保留审计痕迹。
+
+      3. 严重级别与 SLA 可在 Configuration → SLA Configuration 里按产品调整。
+
+      4. 想给同事分权限：Configuration → Users 建账号并加入产品成员（Authorized Users），非成员看不到该产品。
+
+      5. 数据都存在本地 PostgreSQL 中（微服持久卷），升级/重启不丢；备份请一并备份该应用的数据目录。
+
+
+      【FAQ】
+
+      - 打开后停在「正在初始化」页面很久？首次安装要建表并灌入基础数据，实机实测约 2~5 分钟；等待页每 6 秒自动刷新，无需手动操作。
+
+      - 界面是英文？可在右上角用户菜单 → 语言切换为「简体中文」（应用默认已按中文初始化，浏览器语言为中文时自动显示中文）。
+
+      - 需要连外网吗？不需要。所有数据都在本机，扫描器报告由你手动或 CI 上传。
+
+      - 这是免费版吗？是。本应用使用 DefectDojo 开源社区版（BSD-3-Clause），无功能限制，不含其商业 Pro 版特性。
+  en-US:
+    name: DefectDojo
+    description: >-
+      Open-source unified vulnerability management (DevSecOps / ASPM). Aggregate
+      findings from Trivy / Semgrep / Nessus / Burp / ZAP / SonarQube and 200+
+      other scanners, deduplicate them automatically, track remediation per
+      product and release, and report on trends and SLAs
+    usage: >-
+      DefectDojo is the OWASP flagship open-source vulnerability management and
+      ASPM platform. Scanners find issues; DefectDojo manages them - aggregating
+      results, deduplicating, assigning owners, tracking remediation and
+      reporting. This app is protected by the MicroServer gateway; open it and
+      you land in the DefectDojo UI.
+
+
+      [Login]
+
+      The app ships with an administrator account and signs in automatically
+      when you open the app; no manual typing is needed. The initial credentials
+      are username admin and password DefectDojo@2026. Change the password from
+      the user menu after the first login; if automatic sign-in does not pick up
+      the new password, type it once on the login page.
+
+
+      [First start takes a few minutes]
+
+      On first boot the container runs database migrations and initialization
+      (schema + base data + admin user) - about 2-5 minutes on real hardware.
+      During that time the app shows a "DefectDojo is starting" page that
+      refreshes itself every 6 seconds, and it enters the login page
+      automatically once initialization finishes - no manual refresh and no
+      error page. This happens only on the first install; later restarts and
+      upgrades take seconds.
+
+
+      [Core concepts]
+
+      1. Product Type - top level grouping, e.g. "Web applications".
+
+      2. Product - the system/project being assessed; findings live under it.
+
+      3. Engagement - one security assessment with a start/end date and type.
+
+      4. Finding - an individual vulnerability with severity, description,
+      status and owner.
+
+
+      [Quick start: import a scan result (3 steps)]
+
+      1. Products -> Add Product: give it a name and a Product Type, save.
+
+      2. Open the product -> Engagements -> Add Engagement: name and dates,
+      save.
+
+      3. Open the engagement -> Import Scan Result: pick the scanner type (Trivy
+      Scan, Semgrep JSON, Nessus, Burp, ZAP, 200+ supported), upload the report,
+      click Import. Findings then appear with severity breakdown and
+      deduplication applied.
+
+
+      [Wire up your own scanners (CI/CD)]
+
+      1. User menu -> API v2 Key to create an API token (or POST
+      /api/v2/api-token-auth/ with username/password).
+
+      2. Upload from your pipeline:
+         curl -X POST "https://<your-subdomain>/api/v2/import-scan/" \
+           -H "Authorization: Token <API_TOKEN>" \
+           -F "scan_type=Trivy Scan" -F "file=@trivy-report.json" \
+           -F "engagement=<engagement_id>" -F "active=true" -F "verified=false"
+      3. Re-importing the same report: first switch on the global "Enable
+      Deduplication" toggle under Configuration -> System Settings. With it on,
+      a re-import does not double-count a finding - DefectDojo computes the same
+      hash for (product + title + component + line), marks the later one as a
+      duplicate and links it to the earliest master record; the Findings list
+      shows only master records unless you filter for duplicates. This is
+      verified on a real installation; the toggle is OFF by default, and without
+      it the same report imported twice shows up as two independently counted
+      findings.
+
+
+      [Reports and metrics]
+
+      - Dashboard: active findings, severity breakdown, per-product
+      distribution.
+
+      - Metrics: opened vs. closed trends, severity over time, top risk
+      products.
+
+      - Product -> Metrics: finding age, SLA compliance, remediation time.
+
+      - Every list page can be exported to CSV.
+
+
+      [Tips]
+
+      1. Bulk Edit on the Findings list to change status/owner in batch.
+
+      2. Mark false positives as False Positive instead of deleting, to keep the
+      audit trail.
+
+      3. Adjust severities and SLA per product under Configuration -> SLA
+      Configuration.
+
+      4. Invite teammates under Configuration -> Users and add them as product
+      members (Authorized Users); non-members cannot see the product.
+
+      5. All data lives in a local PostgreSQL database on the MicroServer
+      persistent volume and survives restarts and upgrades.
+
+
+      [FAQ]
+
+      - Stuck on the "starting up" page for a long time? The first install
+      builds the schema and loads base data - about 2-5 minutes on real
+      hardware; the page refreshes itself, nothing to click.
+
+      - UI language? Switch it from the user menu; it defaults to Chinese when
+      your browser is Chinese.
+
+      - Internet required? No. Everything runs locally; you upload scanner
+      reports yourself or from CI.
+
+      - Is this the free edition? Yes - the open-source Community Edition
+      (BSD-3-Clause) with no feature limits; the commercial Pro edition is not
+      included.

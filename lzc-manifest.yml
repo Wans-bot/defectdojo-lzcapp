@@ -119,7 +119,8 @@ services:
     binds:
       - /lzcapp/var/valkey:/data
   nginx:
-    image: registry.lazycat.cloud/wans/defectdojo/defectdojo-nginx:bb473feb5f7c8f58
+    # upstream: docker.io/defectdojo/defectdojo-nginx:3.4.101
+    image: registry.lazycat.cloud/wans/defectdojo/defectdojo-nginx:921c9d7ec0207db7
     entrypoint: /bin/sh
     command: /lzcapp/pkg/content/nginx-entry.sh
     environment:
@@ -130,7 +131,8 @@ services:
     binds:
       - /lzcapp/var/ready:/lzcapp/var/ready
   uwsgi:
-    image: registry.lazycat.cloud/wans/defectdojo/defectdojo-django:a3cd0eb0cda5cb41
+    # upstream: docker.io/defectdojo/defectdojo-django:3.4.101
+    image: registry.lazycat.cloud/wans/defectdojo/defectdojo-django:bd1b3c277f0fd2bd
     entrypoint: /bin/bash
     command: /lzcapp/pkg/content/uwsgi-entry.sh
     user: root
@@ -160,9 +162,7 @@ services:
       test:
         - CMD-SHELL
         - >-
-          python3 -c "import
-          socket;s=socket.create_connection(('127.0.0.1',3031),5);s.close()" ||
-          exit 1
+          python3 -c "import socket;s=socket.create_connection(('127.0.0.1',3031),5);s.close()" || exit 1
       interval: 15s
       timeout: 10s
       retries: 40
@@ -171,7 +171,8 @@ services:
       - /lzcapp/var/media:/app/media
       - /lzcapp/var/ready:/lzcapp/var/ready
   celerybeat:
-    image: registry.lazycat.cloud/wans/defectdojo/defectdojo-django:a3cd0eb0cda5cb41
+    # upstream: docker.io/defectdojo/defectdojo-django:3.4.101
+    image: registry.lazycat.cloud/wans/defectdojo/defectdojo-django:bd1b3c277f0fd2bd
     entrypoint: /bin/bash
     command: /lzcapp/pkg/content/celery-beat-entry.sh
     user: root
@@ -188,7 +189,8 @@ services:
       - DD_LANGUAGE_CODE=zh-hans
       - TZ=Asia/Shanghai
   celeryworker:
-    image: registry.lazycat.cloud/wans/defectdojo/defectdojo-django:a3cd0eb0cda5cb41
+    # upstream: docker.io/defectdojo/defectdojo-django:3.4.101
+    image: registry.lazycat.cloud/wans/defectdojo/defectdojo-django:bd1b3c277f0fd2bd
     entrypoint: /bin/bash
     command: /lzcapp/pkg/content/celery-worker-entry.sh
     user: root

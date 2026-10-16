@@ -1,7 +1,7 @@
 name: DefectDojo
 description: 开源统一漏洞管理平台（DevSecOps / ASPM）：聚合各类扫描器的漏洞结果、自动去重、跟踪修复进度并输出统计报表
 package: cloud.lazycat.app.defectdojo
-version: 3.4.0-8
+version: 3.4.101
 author: DefectDojo
 license: BSD-3-Clause
 homepage: https://github.com/DefectDojo/django-DefectDojo
@@ -16,27 +16,19 @@ locales:
   zh-CN:
     name: DefectDojo 漏洞管理平台
     description: >-
-      开源统一漏洞管理平台（OWASP Flagship 项目）。把 Trivy / Semgrep / Nessus / Burp / ZAP /
-      SonarQube 等上百种扫描器的结果汇聚到一处，自动去重、按产品与版本跟踪修复状态、输出漏洞趋势与 SLA 报表，是 DevSecOps /
-      应用安全团队管理漏洞的标准工具
+      开源统一漏洞管理平台（OWASP Flagship 项目）。把 Trivy / Semgrep / Nessus / Burp / ZAP / SonarQube 等上百种扫描器的结果汇聚到一处，自动去重、按产品与版本跟踪修复状态、输出漏洞趋势与 SLA 报表，是 DevSecOps / 应用安全团队管理漏洞的标准工具
     usage: >-
-      DefectDojo 是 OWASP 旗舰级的开源漏洞管理（Vulnerability Management /
-      ASPM）平台。扫描器负责「发现问题」，DefectDojo
-      负责「把问题管起来」：汇总结果、自动去重、分派负责人、跟踪修复状态、输出统计报表。本应用已由微服账号门禁保护，打开即进入 DefectDojo
-      界面。
+      DefectDojo 是 OWASP 旗舰级的开源漏洞管理（Vulnerability Management / ASPM）平台。扫描器负责「发现问题」，DefectDojo 负责「把问题管起来」：汇总结果、自动去重、分派负责人、跟踪修复状态、输出统计报表。本应用已由微服账号门禁保护，打开即进入 DefectDojo 界面。
 
 
       【登录信息】
 
-      应用已内置管理员，打开应用会自动完成登录，无需手动输入账号密码。初始账号为 admin，初始密码为
-      DefectDojo@2026。首次进入后建议在右上角用户菜单 → 修改密码；改密码后自动登录会改用新密码，若自动登录未生效，可在登录页手动输入一次新账号密码。
+      应用已内置管理员，打开应用会自动完成登录，无需手动输入账号密码。初始账号为 admin，初始密码为 DefectDojo@2026。首次进入后建议在右上角用户菜单 → 修改密码；改密码后自动登录会改用新密码，若自动登录未生效，可在登录页手动输入一次新账号密码。
 
 
       【首次启动请稍候（重要）】
 
-      第一次启动时容器会自动做数据库迁移与初始化（建表 + 建管理员），实机实测约 2~5 分钟。这期间页面显示的是「DefectDojo
-      正在初始化」等待页并每 6
-      秒自动刷新，初始化完成后会自动进入登录页——不需要手动刷新，也不会出现报错页。初始化只在首次安装时执行，之后重启、升级都是秒级进入。
+      第一次启动时容器会自动做数据库迁移与初始化（建表 + 建管理员），实机实测约 2~5 分钟。这期间页面显示的是「DefectDojo 正在初始化」等待页并每 6 秒自动刷新，初始化完成后会自动进入登录页——不需要手动刷新，也不会出现报错页。初始化只在首次安装时执行，之后重启、升级都是秒级进入。
 
 
       【一、先认识 4 个核心概念】
@@ -56,9 +48,7 @@ locales:
 
       2. 进入该产品 → Engagements → Add Engagement，填名称与起止日期，保存。
 
-      3. 进入该 Engagement → Import Scan Result，选择扫描器类型（如 Trivy Scan、Semgrep
-      JSON、Nessus、Burp、ZAP 等 200+ 种），上传扫描报告文件，点 Import。导入后 Findings
-      页即可看到漏洞列表、严重级别分布与重复项合并结果。
+      3. 进入该 Engagement → Import Scan Result，选择扫描器类型（如 Trivy Scan、Semgrep JSON、Nessus、Burp、ZAP 等 200+ 种），上传扫描报告文件，点 Import。导入后 Findings 页即可看到漏洞列表、严重级别分布与重复项合并结果。
 
 
       【三、接入你自己的扫描器（CI/CD 自动化）】
@@ -66,14 +56,12 @@ locales:
       1. 右上角用户菜单 → API v2 Key：生成 API Token（也可用 /api/v2/api-token-auth/ 用账号密码换取）。
 
       2. 在 CI 流水线里调用上传接口，让扫描结果自动入库：
+
          curl -X POST "https://<你的子域名>/api/v2/import-scan/" \
            -H "Authorization: Token <API_TOKEN>" \
            -F "scan_type=Trivy Scan" -F "file=@trivy-report.json" \
            -F "engagement=<engagement_id>" -F "active=true" -F "verified=false"
-      3. 重复导入同一份报告：先去「配置 → 系统设置」把全局「启用去重」打开。开启后重复导入 不会把同一漏洞重复计数——DefectDojo
-      会按（产品 + 漏洞标题 + 组件 + 行号）算出相同的 哈希值，把后导入的那条标记为「重复」并关联到最早的那条主记录；在 Findings 列表里
-      默认只显示主记录，勾选过滤器「包含重复项」才看得到全部。这是实机验证过的行为（默认
-      该开关是关闭的，不打开的话同一份报告导两次会出现两条各算一次的漏洞）。
+      3. 重复导入同一份报告：先去「配置 → 系统设置」把全局「启用去重」打开。开启后重复导入 不会把同一漏洞重复计数——DefectDojo 会按（产品 + 漏洞标题 + 组件 + 行号）算出相同的 哈希值，把后导入的那条标记为「重复」并关联到最早的那条主记录；在 Findings 列表里 默认只显示主记录，勾选过滤器「包含重复项」才看得到全部。这是实机验证过的行为（默认 该开关是关闭的，不打开的话同一份报告导两次会出现两条各算一次的漏洞）。
 
       4. 扫描器类型清单见 Import Scan 页面的下拉框；拿不准格式时先看「Supported scan types」。
 
@@ -114,36 +102,19 @@ locales:
   en-US:
     name: DefectDojo
     description: >-
-      Open-source unified vulnerability management (DevSecOps / ASPM). Aggregate
-      findings from Trivy / Semgrep / Nessus / Burp / ZAP / SonarQube and 200+
-      other scanners, deduplicate them automatically, track remediation per
-      product and release, and report on trends and SLAs
+      Open-source unified vulnerability management (DevSecOps / ASPM). Aggregate findings from Trivy / Semgrep / Nessus / Burp / ZAP / SonarQube and 200+ other scanners, deduplicate them automatically, track remediation per product and release, and report on trends and SLAs
     usage: >-
-      DefectDojo is the OWASP flagship open-source vulnerability management and
-      ASPM platform. Scanners find issues; DefectDojo manages them - aggregating
-      results, deduplicating, assigning owners, tracking remediation and
-      reporting. This app is protected by the MicroServer gateway; open it and
-      you land in the DefectDojo UI.
+      DefectDojo is the OWASP flagship open-source vulnerability management and ASPM platform. Scanners find issues; DefectDojo manages them - aggregating results, deduplicating, assigning owners, tracking remediation and reporting. This app is protected by the MicroServer gateway; open it and you land in the DefectDojo UI.
 
 
       [Login]
 
-      The app ships with an administrator account and signs in automatically
-      when you open the app; no manual typing is needed. The initial credentials
-      are username admin and password DefectDojo@2026. Change the password from
-      the user menu after the first login; if automatic sign-in does not pick up
-      the new password, type it once on the login page.
+      The app ships with an administrator account and signs in automatically when you open the app; no manual typing is needed. The initial credentials are username admin and password DefectDojo@2026. Change the password from the user menu after the first login; if automatic sign-in does not pick up the new password, type it once on the login page.
 
 
       [First start takes a few minutes]
 
-      On first boot the container runs database migrations and initialization
-      (schema + base data + admin user) - about 2-5 minutes on real hardware.
-      During that time the app shows a "DefectDojo is starting" page that
-      refreshes itself every 6 seconds, and it enters the login page
-      automatically once initialization finishes - no manual refresh and no
-      error page. This happens only on the first install; later restarts and
-      upgrades take seconds.
+      On first boot the container runs database migrations and initialization (schema + base data + admin user) - about 2-5 minutes on real hardware. During that time the app shows a "DefectDojo is starting" page that refreshes itself every 6 seconds, and it enters the login page automatically once initialization finishes - no manual refresh and no error page. This happens only on the first install; later restarts and upgrades take seconds.
 
 
       [Core concepts]
@@ -154,51 +125,36 @@ locales:
 
       3. Engagement - one security assessment with a start/end date and type.
 
-      4. Finding - an individual vulnerability with severity, description,
-      status and owner.
+      4. Finding - an individual vulnerability with severity, description, status and owner.
 
 
       [Quick start: import a scan result (3 steps)]
 
       1. Products -> Add Product: give it a name and a Product Type, save.
 
-      2. Open the product -> Engagements -> Add Engagement: name and dates,
-      save.
+      2. Open the product -> Engagements -> Add Engagement: name and dates, save.
 
-      3. Open the engagement -> Import Scan Result: pick the scanner type (Trivy
-      Scan, Semgrep JSON, Nessus, Burp, ZAP, 200+ supported), upload the report,
-      click Import. Findings then appear with severity breakdown and
-      deduplication applied.
+      3. Open the engagement -> Import Scan Result: pick the scanner type (Trivy Scan, Semgrep JSON, Nessus, Burp, ZAP, 200+ supported), upload the report, click Import. Findings then appear with severity breakdown and deduplication applied.
 
 
       [Wire up your own scanners (CI/CD)]
 
-      1. User menu -> API v2 Key to create an API token (or POST
-      /api/v2/api-token-auth/ with username/password).
+      1. User menu -> API v2 Key to create an API token (or POST /api/v2/api-token-auth/ with username/password).
 
       2. Upload from your pipeline:
+
          curl -X POST "https://<your-subdomain>/api/v2/import-scan/" \
            -H "Authorization: Token <API_TOKEN>" \
            -F "scan_type=Trivy Scan" -F "file=@trivy-report.json" \
            -F "engagement=<engagement_id>" -F "active=true" -F "verified=false"
-      3. Re-importing the same report: first switch on the global "Enable
-      Deduplication" toggle under Configuration -> System Settings. With it on,
-      a re-import does not double-count a finding - DefectDojo computes the same
-      hash for (product + title + component + line), marks the later one as a
-      duplicate and links it to the earliest master record; the Findings list
-      shows only master records unless you filter for duplicates. This is
-      verified on a real installation; the toggle is OFF by default, and without
-      it the same report imported twice shows up as two independently counted
-      findings.
+      3. Re-importing the same report: first switch on the global "Enable Deduplication" toggle under Configuration -> System Settings. With it on, a re-import does not double-count a finding - DefectDojo computes the same hash for (product + title + component + line), marks the later one as a duplicate and links it to the earliest master record; the Findings list shows only master records unless you filter for duplicates. This is verified on a real installation; the toggle is OFF by default, and without it the same report imported twice shows up as two independently counted findings.
 
 
       [Reports and metrics]
 
-      - Dashboard: active findings, severity breakdown, per-product
-      distribution.
+      - Dashboard: active findings, severity breakdown, per-product distribution.
 
-      - Metrics: opened vs. closed trends, severity over time, top risk
-      products.
+      - Metrics: opened vs. closed trends, severity over time, top risk products.
 
       - Product -> Metrics: finding age, SLA compliance, remediation time.
 
@@ -209,31 +165,21 @@ locales:
 
       1. Bulk Edit on the Findings list to change status/owner in batch.
 
-      2. Mark false positives as False Positive instead of deleting, to keep the
-      audit trail.
+      2. Mark false positives as False Positive instead of deleting, to keep the audit trail.
 
-      3. Adjust severities and SLA per product under Configuration -> SLA
-      Configuration.
+      3. Adjust severities and SLA per product under Configuration -> SLA Configuration.
 
-      4. Invite teammates under Configuration -> Users and add them as product
-      members (Authorized Users); non-members cannot see the product.
+      4. Invite teammates under Configuration -> Users and add them as product members (Authorized Users); non-members cannot see the product.
 
-      5. All data lives in a local PostgreSQL database on the MicroServer
-      persistent volume and survives restarts and upgrades.
+      5. All data lives in a local PostgreSQL database on the MicroServer persistent volume and survives restarts and upgrades.
 
 
       [FAQ]
 
-      - Stuck on the "starting up" page for a long time? The first install
-      builds the schema and loads base data - about 2-5 minutes on real
-      hardware; the page refreshes itself, nothing to click.
+      - Stuck on the "starting up" page for a long time? The first install builds the schema and loads base data - about 2-5 minutes on real hardware; the page refreshes itself, nothing to click.
 
-      - UI language? Switch it from the user menu; it defaults to Chinese when
-      your browser is Chinese.
+      - UI language? Switch it from the user menu; it defaults to Chinese when your browser is Chinese.
 
-      - Internet required? No. Everything runs locally; you upload scanner
-      reports yourself or from CI.
+      - Internet required? No. Everything runs locally; you upload scanner reports yourself or from CI.
 
-      - Is this the free edition? Yes - the open-source Community Edition
-      (BSD-3-Clause) with no feature limits; the commercial Pro edition is not
-      included.
+      - Is this the free edition? Yes - the open-source Community Edition (BSD-3-Clause) with no feature limits; the commercial Pro edition is not included.

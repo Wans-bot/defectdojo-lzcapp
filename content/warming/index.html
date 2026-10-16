@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>DefectDojo 正在初始化</title>
+<style>
+  :root { color-scheme: light dark; }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; min-height: 100vh; display: flex; align-items: center; justify-content: center;
+    font: 15px/1.7 -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+    background: linear-gradient(135deg, #f4f7fb 0%, #eef2f7 50%, #f7f9fc 100%);
+    color: #1f2733; padding: 24px;
+  }
+  .card {
+    width: 100%; max-width: 34rem; background: #fff; border-radius: 14px;
+    box-shadow: 0 1px 2px rgba(16,24,40,.04), 0 12px 32px -8px rgba(16,24,40,.12);
+    padding: 40px 36px; text-align: center;
+  }
+  .spinner {
+    width: 44px; height: 44px; margin: 0 auto 22px; border-radius: 50%;
+    border: 3px solid #dbe3ee; border-top-color: #2f7ce0; animation: spin 1s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  h1 { font-size: 20px; margin: 0 0 10px; font-weight: 600; }
+  p { margin: 0 0 14px; color: #475467; }
+  ol { text-align: left; margin: 18px auto 22px; padding-left: 1.4em; max-width: 27rem; color: #475467; }
+  li { margin: 6px 0; }
+  .hint { font-size: 13px; color: #667085; margin-top: 18px; }
+  .bar { height: 6px; background: #eef2f7; border-radius: 99px; overflow: hidden; margin: 22px 0 6px; }
+  .bar > i { display: block; height: 100%; width: 35%; border-radius: 99px; background: #2f7ce0; animation: slide 2.2s ease-in-out infinite; }
+  @keyframes slide { 0% { margin-left: -35%; } 100% { margin-left: 100%; } }
+  code { background: #f2f4f7; padding: 1px 6px; border-radius: 5px; font-size: .92em; }
+  @media (prefers-color-scheme: dark) {
+    body { background: #0f141b; color: #e6eaf0; }
+    .card { background: #171e27; box-shadow: 0 1px 2px rgba(0,0,0,.3), 0 12px 32px -8px rgba(0,0,0,.5); }
+    p, ol { color: #9aa7b6; }
+    .hint { color: #7d8b9c; }
+    code { background: #212b36; }
+    .bar { background: #212b36; }
+  }
+</style>
+</head>
+<body>
+  <div class="card">
+    <div class="spinner"></div>
+    <h1>DefectDojo 正在初始化，请稍候</h1>
+    <p>这是<b>首次启动</b>：正在创建数据库结构、基础数据与管理员账号，通常需要 2~5 分钟。</p>
+    <div class="bar"><i></i></div>
+    <ol>
+      <li>本页面每 6 秒自动刷新一次，初始化完成后会自动进入 DefectDojo 登录界面。</li>
+      <li>初始化只在首次安装时执行；之后重启、升级都是秒级进入。</li>
+      <li>如果超过 10 分钟仍未进入，请到「微服 → 应用管理」查看本应用状态与日志。</li>
+    </ol>
+    <p class="hint">数据保存在应用自带的本地数据库中，初始化过程不会丢失数据。</p>
+  </div>
+  <script>
+    setTimeout(function () { location.reload(); }, 6000);
+  </script>
+</body>
+</html>

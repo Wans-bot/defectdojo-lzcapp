@@ -1,0 +1,209 @@
+application:
+  subdomain: defectdojo
+  public_path:
+    - /static/
+    - /media/
+  routes:
+    - /=http://nginx.cloud.lazycat.app.defectdojo.lzcapp:8080
+  health_check:
+    test_url: http://nginx.cloud.lazycat.app.defectdojo.lzcapp:8080/__ready/
+    start_period: 1800s
+    timeout: 20s
+  injects:
+    - id: lazycat-file-bridge
+      'on': request
+      when:
+        - /__lazycat_file_bridge/*
+      do:
+        - src: |
+            const bridgePrefix = "/__lazycat_file_bridge";
+            const requestHost = String(ctx.request.host || "")
+              .split(":")[0]
+              .toLowerCase();
+            const firstDot = requestHost.indexOf(".");
+            const method = String(ctx.request.method || "").toUpperCase();
+
+            if (
+              firstDot <= 0 ||
+              !requestHost.endsWith(".heiyu.space") ||
+              !["GET", "HEAD", "PUT"].includes(method)
+            ) {
+              ctx.response.send(
+                ["GET", "HEAD", "PUT"].includes(method) ? 400 : 405,
+                "Invalid LazyCat file bridge request",
+              );
+              return;
+            }
+
+            const boxDomain = requestHost.slice(firstDot + 1);
+            const fileOrigin = "https://file." + boxDomain;
+            const targetPath =
+              "/files/home" + ctx.request.path.slice(bridgePrefix.length);
+
+            ctx.headers.del("Origin");
+            ctx.headers.del("Referer");
+            ctx.proxy.to(fileOrigin, {
+              path: targetPath,
+              query: ctx.request.raw_query,
+              use_target_host: true,
+              timeout_ms: 120000,
+              on_fail: "error",
+            });
+    - id: open-save-chooser
+      'on': browser
+      # 保持默认 auth_required=true（本应用 HTML 页面不公开，页面上未登录根本拿不到；
+      # 无票据上下文里官方选择器脚本必然抛 invalid lzcapp api frontend api request，
+      # 且钩子会挡住原生文件选择。已登录评审客户端照常执行。snapotter/tracearr/misago
+      # 同款教训。）
+      when:
+        - /*
+      do:
+        - src: >-
+            file:///lzcapp/pkg/content/lazycat-injects/lzc-file-chooser-inject.js
+          params:
+            diskRoot: /_lzc/files/home
+            fileBridgeRoot: /__lazycat_file_bridge
+            fallbackMime: application/octet-stream
+            locale: auto
+            hooks:
+              fileSystemAccess: true
+              fileInput: true
+              downloadAnchor: true
+    # 驳回 #20257 修复：导出按钮（/reports/csv_export、/reports/excel_export）
+    # 是普通 <a href> 下载（无 download 属性、非 blob:），官方拦截器不接管。
+    # 本注入把它们转成 blob: 锚点再交给官方选择器 → 弹「保存至懒猫」。
+    - id: defectdojo-http-download-bridge
+      'on': browser
+      when:
+        - /*
+      do:
+        - src: file:///lzcapp/pkg/content/lazycat-injects/defectdojo-http-download-bridge.js
+    - id: lazycat-auto-login
+      'on': browser
+      auth_required: false
+      when:
+        - /*
+      do:
+        - src: file:///lzcapp/pkg/content/auto-login.js
+          params:
+            user: admin
+            password: DefectDojo@2026
+services:
+  postgres:
+    image: registry.lazycat.cloud/wans/library/postgres:501c5aed12e9b0ef
+    environment:
+      - POSTGRES_DB=defectdojo
+      - POSTGRES_USER=defectdojo
+      - POSTGRES_PASSWORD=defectdojo
+      - TZ=Asia/Shanghai
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - pg_isready -U defectdojo -d defectdojo
+      interval: 10s
+      timeout: 10s
+      retries: 60
+      start_period: 600s
+    binds:
+      - /lzcapp/var/postgres:/var/lib/postgresql
+  valkey:
+    image: registry.lazycat.cloud/wans/valkey/valkey:d4b33b80430f86b2
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - valkey-cli ping | grep -q PONG
+      interval: 10s
+      timeout: 5s
+      retries: 60
+      start_period: 300s
+    binds:
+      - /lzcapp/var/valkey:/data
+  nginx:
+    image: registry.lazycat.cloud/wans/defectdojo/defectdojo-nginx:bb473feb5f7c8f58
+    entrypoint: /bin/sh
+    command: /lzcapp/pkg/content/nginx-entry.sh
+    environment:
+      - DD_UWSGI_HOST=uwsgi.cloud.lazycat.app.defectdojo.lzcapp
+      - DD_UWSGI_PORT=3031
+      - NGINX_METRICS_ENABLED=false
+      - LZ_READY_DIR=/lzcapp/var/ready
+    binds:
+      - /lzcapp/var/ready:/lzcapp/var/ready
+  uwsgi:
+    image: registry.lazycat.cloud/wans/defectdojo/defectdojo-django:a3cd0eb0cda5cb41
+    entrypoint: /bin/bash
+    command: /lzcapp/pkg/content/uwsgi-entry.sh
+    user: root
+    environment:
+      - >-
+        DD_DATABASE_URL=postgresql://defectdojo:defectdojo@postgres.cloud.lazycat.app.defectdojo.lzcapp:5432/defectdojo
+      - >-
+        DD_CELERY_BROKER_URL=redis://valkey.cloud.lazycat.app.defectdojo.lzcapp:6379/0
+      - DD_CACHE_URL=redis://valkey.cloud.lazycat.app.defectdojo.lzcapp:6379/1
+      - >-
+        DD_SECRET_KEY=lzc-DefectDojo-2026-s3cret-k3y-4f2d9c7e1b8a6d5f3e0c9b7a5d2e8f1c
+      - DD_CREDENTIAL_AES_256_KEY=7f2a9c4e8b1d5f6a3c7e0b9d2f5a8c1e
+      - DD_ALLOWED_HOSTS=*
+      - DD_ADMIN_USER=admin
+      - DD_ADMIN_PASSWORD=DefectDojo@2026
+      - DD_ADMIN_MAIL=admin@defectdojo.local
+      - DD_ADMIN_FIRST_NAME=Admin
+      - DD_ADMIN_LAST_NAME=User
+      - DD_INITIALIZE=true
+      - DD_LANGUAGE_CODE=zh-hans
+      - DD_UWSGI_NUM_OF_PROCESSES=2
+      - DD_UWSGI_NUM_OF_THREADS=4
+      - DD_CELERY_WORKER_POOL_TYPE=solo
+      - LZ_READY_DIR=/lzcapp/var/ready
+      - TZ=Asia/Shanghai
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - >-
+          python3 -c "import
+          socket;s=socket.create_connection(('127.0.0.1',3031),5);s.close()" ||
+          exit 1
+      interval: 15s
+      timeout: 10s
+      retries: 40
+      start_period: 1800s
+    binds:
+      - /lzcapp/var/media:/app/media
+      - /lzcapp/var/ready:/lzcapp/var/ready
+  celerybeat:
+    image: registry.lazycat.cloud/wans/defectdojo/defectdojo-django:a3cd0eb0cda5cb41
+    entrypoint: /bin/bash
+    command: /lzcapp/pkg/content/celery-beat-entry.sh
+    user: root
+    environment:
+      - >-
+        DD_DATABASE_URL=postgresql://defectdojo:defectdojo@postgres.cloud.lazycat.app.defectdojo.lzcapp:5432/defectdojo
+      - >-
+        DD_CELERY_BROKER_URL=redis://valkey.cloud.lazycat.app.defectdojo.lzcapp:6379/0
+      - DD_CACHE_URL=redis://valkey.cloud.lazycat.app.defectdojo.lzcapp:6379/1
+      - >-
+        DD_SECRET_KEY=lzc-DefectDojo-2026-s3cret-k3y-4f2d9c7e1b8a6d5f3e0c9b7a5d2e8f1c
+      - DD_CREDENTIAL_AES_256_KEY=7f2a9c4e8b1d5f6a3c7e0b9d2f5a8c1e
+      - DD_ALLOWED_HOSTS=*
+      - DD_LANGUAGE_CODE=zh-hans
+      - TZ=Asia/Shanghai
+  celeryworker:
+    image: registry.lazycat.cloud/wans/defectdojo/defectdojo-django:a3cd0eb0cda5cb41
+    entrypoint: /bin/bash
+    command: /lzcapp/pkg/content/celery-worker-entry.sh
+    user: root
+    environment:
+      - >-
+        DD_DATABASE_URL=postgresql://defectdojo:defectdojo@postgres.cloud.lazycat.app.defectdojo.lzcapp:5432/defectdojo
+      - >-
+        DD_CELERY_BROKER_URL=redis://valkey.cloud.lazycat.app.defectdojo.lzcapp:6379/0
+      - DD_CACHE_URL=redis://valkey.cloud.lazycat.app.defectdojo.lzcapp:6379/1
+      - >-
+        DD_SECRET_KEY=lzc-DefectDojo-2026-s3cret-k3y-4f2d9c7e1b8a6d5f3e0b9d2f5a8c1e
+      - DD_CREDENTIAL_AES_256_KEY=7f2a9c4e8b1d5f6a3c7e0b9d2f5a8c1e
+      - DD_ALLOWED_HOSTS=*
+      - DD_LANGUAGE_CODE=zh-hans
+      - DD_CELERY_WORKER_POOL_TYPE=solo
+      - TZ=Asia/Shanghai
+    binds:
+      - /lzcapp/var/media:/app/media

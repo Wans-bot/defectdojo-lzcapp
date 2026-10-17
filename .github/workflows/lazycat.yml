@@ -1,23 +1,23 @@
 name: LazyCat LPK
 
-# 定时检查上游镜像标签，有新版本就复制镜像、改版本与 Manifest、构建 LPK、创建 Release；
-# 官方商店发布在 .github/lazycat-action.yml 里单独开关，实机验收通过后再打开。
+# 自动更新：定时检查上游新版本 → 改版本号 → 打包 → 发 Release（可选提交商店）。
+# 也可手动 workflow_dispatch，或推 v* tag 走 publish。
 on:
+  push:
+    tags:
+      - "v*"
+
   schedule:
-    - cron: "37 3 * * *"
+    - cron: "17 3 * * *"
   workflow_dispatch:
     inputs:
       operation:
-        description: "auto 自动判断 / check 只检查 / build 只构建 / publish-official 只提交官方商店"
+        description: "auto / check / build / publish-official"
         type: choice
-        options:
-          - auto
-          - check
-          - build
-          - publish-official
+        options: [auto, check, build, publish-official]
         default: auto
       dry-run:
-        description: "只演练不写文件、不复制镜像、不发布"
+        description: "只演练，不写文件、不发布"
         type: boolean
         default: false
 
@@ -27,7 +27,6 @@ permissions:
 
 jobs:
   lazycat:
-    # 固定提交，不用浮动 v1 标签，保证构建行为可复现
     uses: ca-x/lazycat-github-action/.github/workflows/lazycat.yml@3dabca95f6eb0c3a6c4fc889631b13a055852912
     with:
       operation: ${{ inputs.operation || 'auto' }}
@@ -35,5 +34,4 @@ jobs:
       dry-run: ${{ inputs.dry-run || false }}
       versioned-release-asset: true
     secrets:
-      LZC_API_HOST: ${{ secrets.LZC_API_HOST }}
-      LZC_API_TOKEN: ${{ secrets.LZC_API_TOKEN }}
+      LAZYCAT_TOKEN: ${{ secrets.LAZYCAT_TOKEN }}

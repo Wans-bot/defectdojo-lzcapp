@@ -1,13 +1,10 @@
-# DefectDojo 的 LPK 自动更新配置
-# 上游镜像：defectdojo/defectdojo-django 与 defectdojo/defectdojo-nginx，两者同版本发布（3.x）。
-# postgres 与 valkey 是基础设施镜像，不随应用版本走，不在此管理。
 version: 1
 
 project:
   root: .
   build_config: lzc-build.yml
   package_file: package.yml
-  output: dist/defectdojo.lpk
+  output: out/defectdojo.lpk
   target_arch: amd64
 
 update:
@@ -15,56 +12,23 @@ update:
   allow_downgrade: false
   version_source:
     type: image
-    image: django
-
+    image: app
 build:
   run_buildscript: false
 
 images:
-  # 同一个 django 镜像被 uwsgi、celerybeat、celeryworker 三个 service 使用，逐条列出
-  - id: django
-    target: service
-    service: uwsgi
-    source: docker.io/defectdojo/defectdojo-django
-    channel: stable
-    tag_regex: '^v?3\.\d+\.\d+$'
-    sort: semver
-    delivery:
-      mode: lazycat
-  - id: django-beat
-    target: service
-    service: celerybeat
-    source: docker.io/defectdojo/defectdojo-django
-    channel: stable
-    tag_regex: '^v?3\.\d+\.\d+$'
-    sort: semver
-    delivery:
-      mode: lazycat
-  - id: django-worker
-    target: service
-    service: celeryworker
-    source: docker.io/defectdojo/defectdojo-django
-    channel: stable
-    tag_regex: '^v?3\.\d+\.\d+$'
-    sort: semver
-    delivery:
-      mode: lazycat
-  - id: nginx
+  - id: app
     target: service
     service: nginx
     source: docker.io/defectdojo/defectdojo-nginx
     channel: stable
-    tag_regex: '^v?3\.\d+\.\d+$'
+    tag_regex: '^v?\d+\.\d+\.\d+$'
     sort: semver
     delivery:
       mode: lazycat
 
 stores:
   official:
-    enabled: true
-    continue_if_newer_version: true
-    skip_if_version_exists: true
-    create_if_missing: false
-    changelog_locales: [zh, en]
+    enabled: false
   private:
     enabled: false

@@ -1,0 +1,43 @@
+{
+ "domain": "defectdojo.wans.heiyu.space",
+ "mode": "during",
+ "startedAt": "2026-10-19T09:34:00.856Z",
+ "steps": [
+  {
+   "at": "2026-10-19T09:34:01.641Z",
+   "msg": "+0.6s 页面：title=\"DefectDojo 正在初始化\" url=https://defectdojo.wans.heiyu.space/"
+  },
+  {
+   "at": "2026-10-19T09:34:01.641Z",
+   "msg": "   正文开头：\"DefectDojo 正在初始化，请稍候\\n\\n这是首次启动：正在创建数据库结构、基础数据与管理员账号，通常需要 2~5 分钟。\\n\\n本页面每 6 秒自动刷新一次，初始化完成后会自动进入 DefectDojo 登录界面。\\n初始化只在首次安装时执行\""
+  },
+  {
+   "at": "2026-10-19T09:34:01.966Z",
+   "msg": "  shot pc-01-first-install-waiting-1920x1080.png 1920x1080 416KB"
+  },
+  {
+   "at": "2026-10-19T09:37:10.689Z",
+   "msg": "+189.7s 页面：title=\"DefectDojo\" url=https://defectdojo.wans.heiyu.space/login?next=/"
+  },
+  {
+   "at": "2026-10-19T09:37:10.689Z",
+   "msg": "   正文开头：\"欢迎回来\\n登录您的账户\\n\\nRequired fields are marked with an asterisk*\\n\\n用户名*\\n\\n密码*\\n\\n显示密码\\n登录\\n忘记密码？\\n忘记用户名？\\n\\nVersion 3.4.101 (release mod\""
+  },
+  {
+   "at": "2026-10-19T09:37:10.690Z",
+   "msg": "+189.7s 应用已就绪"
+  }
+ ],
+ "console": [],
+ "shots": [
+  {
+   "file": "pc-01-first-install-waiting-1920x1080.png",
+   "w": 1920,
+   "h": 1080,
+   "bytes": 425678
+  }
+ ],
+ "waitingShot": true,
+ "finishedAt": "2026-10-19T09:37:10.690Z",
+ "consoleErrors": 0
+}

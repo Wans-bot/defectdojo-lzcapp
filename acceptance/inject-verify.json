@@ -1,0 +1,113 @@
+{
+ "startedAt": "2026-10-19T09:49:13.632Z",
+ "checks": {
+  "登录页可访问（非 Injection Failed）": {
+   "ok": true,
+   "detail": {
+    "status": 200,
+    "injectionFailed": false,
+    "hasUserField": true,
+    "len": 40823
+   }
+  },
+  "#20451 登录成功（无 CSRF 403）": {
+   "ok": true,
+   "detail": {
+    "url": "https://defectdojo.wans.heiyu.space/simple_search?query=",
+    "title": "简单搜索 | DefectDojo",
+    "body": "仪表板\n资产\n测试活动\n发现项\n组件\n端点\n报告\n指标\n用户\n日历\n问卷\n配置\n升级\n0\n首页\n 简单搜索\n简单搜索 \n\nVersion 3.4.101 (release mode)\n\nDetailed DefectDojo documentation can be found in our GitHub Pages."
+   }
+  },
+  "注入送达：download-bridge 标签存在": {
+   "ok": true,
+   "detail": {
+    "scripts": [
+     "/_lzc/injects/inject_loader.js",
+     "/_lzc/injects/open-save-chooser_0.js",
+     "/_lzc/injects/defectdojo-http-download-bridge_0.js",
+     "/_lzc/injects/lazycat-auto-login_0.js"
+    ]
+   }
+  },
+  "注入送达：open-save-chooser 标签存在": {
+   "ok": true,
+   "detail": {
+    "scripts": [
+     "/_lzc/injects/inject_loader.js",
+     "/_lzc/injects/open-save-chooser_0.js",
+     "/_lzc/injects/defectdojo-http-download-bridge_0.js",
+     "/_lzc/injects/lazycat-auto-login_0.js"
+    ]
+   }
+  },
+  "注入脚本可取回（HTTP 200）": {
+   "ok": true,
+   "detail": {
+    "/_lzc/injects/inject_loader.js": 200,
+    "/_lzc/injects/open-save-chooser_0.js": 200,
+    "/_lzc/injects/defectdojo-http-download-bridge_0.js": 200,
+    "/_lzc/injects/lazycat-auto-login_0.js": 200
+   }
+  },
+  "注入执行：脚本安装成功（标记变量存在）": {
+   "ok": true,
+   "detail": {
+    "marker": "object",
+    "version": 1,
+    "officialAnchorHook": false
+   }
+  },
+  "#20257 导出链接被桥接（拦截计数 +1）": {
+   "ok": true,
+   "detail": {
+    "before": 0,
+    "after": 1,
+    "lastError": "export returned empty body",
+    "anchorCalls": [
+     {
+      "href": "https://defectdojo.wans.heiyu.space/reports/csv_export?lzc_p",
+      "download": null,
+      "hasBlob": false
+     },
+     {
+      "href": "https://defectdojo.wans.heiyu.space/reports/csv_export?lzc_p",
+      "download": "",
+      "hasBlob": false
+     }
+    ]
+   }
+  },
+  "#20257 导航/用户菜单无异常站外跳转": {
+   "ok": true,
+   "detail": {
+    "unexpectedNav": [],
+    "upstreamVendorLinks": [
+     "https://documentation.defectdojo.com/",
+     "https://cloud.defectdojo.com/onboarding?payg=1"
+    ],
+    "footerOnly": [
+     "https://github.com/DefectDojo/django-DefectDojo/blob/master/LICENSE.md",
+     "https://github.com/DefectDojo/django-DefectDojo/blob/master/NOTICE"
+    ]
+   }
+  },
+  "#20257 New User 路由留在本站": {
+   "ok": true,
+   "detail": {
+    "status": 200,
+    "url": "https://defectdojo.wans.heiyu.space/user/add",
+    "stayedOnHost": true,
+    "before": "https://defectdojo.wans.heiyu.space/dashboard"
+   }
+  }
+ },
+ "console": [],
+ "loginForm": "no-fields",
+ "footerExternalLinks": [
+  "https://github.com/DefectDojo/django-DefectDojo/blob/master/LICENSE.md",
+  "https://github.com/DefectDojo/django-DefectDojo/blob/master/NOTICE"
+ ],
+ "finishedAt": "2026-10-19T09:49:22.471Z",
+ "consoleErrorCount": 0,
+ "failures": 0
+}

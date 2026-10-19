@@ -1,0 +1,96 @@
+[
+ {
+  "package": "cloud.lazycat.app.defectdojo",
+  "app_id": 6579,
+  "app_status": 1,
+  "review_id": 20694,
+  "review_status": -1,
+  "version": "3.4.101",
+  "submitted": "2026-10-16T09:27:35.381Z",
+  "reason": "启动报错",
+  "attachment_count": 1,
+  "history": [
+   {
+    "review_id": 19235,
+    "status": -2,
+    "status_name": "已取消",
+    "version": "3.3.200",
+    "created_at": "2026-09-24T00:52:48.972Z",
+    "reason": "开发者提交新的审核，系统自动取消旧审核",
+    "attachments": []
+   },
+   {
+    "review_id": 19335,
+    "status": -1,
+    "status_name": "已驳回",
+    "version": "3.3.200",
+    "created_at": "2026-09-25T11:02:26.507Z",
+    "reason": "启动报错",
+    "attachments": [
+     "/appstore/attachment/a54f1d0a-c092-46a3-be9d-001808a8039f.png"
+    ]
+   },
+   {
+    "review_id": 19575,
+    "status": -2,
+    "status_name": "已取消",
+    "version": "3.3.200-4",
+    "created_at": "2026-09-28T21:48:57.993Z",
+    "reason": "开发者提交新的审核，系统自动取消旧审核",
+    "attachments": []
+   },
+   {
+    "review_id": 19662,
+    "status": 1,
+    "status_name": "已通过",
+    "version": "3.3.200-5",
+    "created_at": "2026-09-30T08:03:09.642Z",
+    "reason": "",
+    "attachments": []
+   },
+   {
+    "review_id": 20257,
+    "status": -1,
+    "status_name": "已驳回",
+    "version": "3.4.0-6",
+    "created_at": "2026-10-11T09:37:04.585Z",
+    "reason": "导出按钮需要支持网盘的文件拦截，点击新建用户按钮之后，会跳转到其他页面。",
+    "attachments": [
+     "/appstore/attachment/f8b9e062-5fd7-43f9-98a4-fae371eb7e03.png",
+     "/appstore/attachment/100c3e1b-5ed4-429e-a135-2a1d697dd9c2.png"
+    ]
+   },
+   {
+    "review_id": 20451,
+    "status": -1,
+    "status_name": "已驳回",
+    "version": "3.4.0-7",
+    "created_at": "2026-10-13T10:36:27.064Z",
+    "reason": "点击应用跳转到了这个页面",
+    "attachments": [
+     "/appstore/attachment/7c738bb7-6bfe-4838-9476-a64da19f8040.png"
+    ]
+   },
+   {
+    "review_id": 20522,
+    "status": 1,
+    "status_name": "已通过",
+    "version": "3.4.0-8",
+    "created_at": "2026-10-14T09:47:21.789Z",
+    "reason": "",
+    "attachments": []
+   },
+   {
+    "review_id": 20694,
+    "status": -1,
+    "status_name": "已驳回",
+    "version": "3.4.101",
+    "created_at": "2026-10-16T09:27:35.381Z",
+    "reason": "启动报错",
+    "attachments": [
+     "/appstore/attachment/84701504-1fc3-4429-b0a4-0be76f432b1d.png"
+    ]
+   }
+  ]
+ }
+]

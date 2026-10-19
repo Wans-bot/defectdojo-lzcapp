@@ -159,12 +159,19 @@ services:
       - LZ_READY_DIR=/lzcapp/var/ready
       - TZ=Asia/Shanghai
     healthcheck:
+      # 判据 = 启动期探针口 8082（由 content/uwsgi-entry.sh 拉起），不是 3031。
+      # 根因（实机测量，见 acceptance/REPORT.md）：平台实例状态 Starting→Running
+      # 只在本服务 healthcheck 首次通过时翻转；而首装必须先跑完 Django 迁移才可能
+      # 监听 3031（实测 194~214s，评审机更慢），这段时间实例一直停在 Starting，
+      # 平台一旦超过自己的等待上限就落到它自己的「应用状态错误」页。
+      # 现在：迁移期 8082 直接 200（body 带阶段名），用户看到的是 nginx 的等待页；
+      # 迁移完成后 8082 转为 3031 的真实存活判定，uwsgi 真挂了仍会 503。
       test:
         - CMD-SHELL
         - >-
-          python3 -c "import socket;s=socket.create_connection(('127.0.0.1',3031),5);s.close()" || exit 1
-      interval: 15s
-      timeout: 10s
+          python3 -c "import urllib.request as u,sys;sys.exit(0 if u.urlopen('http://127.0.0.1:8082/',timeout=8).status==200 else 1)"
+      interval: 10s
+      timeout: 15s
       retries: 40
       start_period: 1800s
     binds:

@@ -1,0 +1,110 @@
+{
+ "domain": "defectdojo.wans.heiyu.space",
+ "mode": "full",
+ "startedAt": "2026-10-19T09:38:02.718Z",
+ "steps": [
+  {
+   "at": "2026-10-19T09:38:03.573Z",
+   "msg": "进入：title=\"DefectDojo\" url=https://defectdojo.wans.heiyu.space/dashboard"
+  },
+  {
+   "at": "2026-10-19T09:38:03.573Z",
+   "msg": "登录后：title=\"DefectDojo\" url=https://defectdojo.wans.heiyu.space/dashboard"
+  },
+  {
+   "at": "2026-10-19T09:38:06.090Z",
+   "msg": "注入核验：{\"bridgeVersion\":null,\"alreadyIntercepted\":null,\"officialAnchorHook\":false,\"pickerDefined\":false,\"injectionFailedPage\":false}"
+  },
+  {
+   "at": "2026-10-19T09:38:08.099Z",
+   "msg": "导出拦截探针：{\"lastError\":\"\"}"
+  },
+  {
+   "at": "2026-10-19T09:38:08.207Z",
+   "msg": "  shot pc-02-home-1920x1080.png 1920x1080 108KB"
+  },
+  {
+   "at": "2026-10-19T09:38:11.330Z",
+   "msg": "页面 /finding：title=\"Findings | DefectDojo\" url=https://defectdojo.wans.heiyu.space/finding 正文=350字"
+  },
+  {
+   "at": "2026-10-19T09:38:11.432Z",
+   "msg": "  shot pc-03-finding-1920x1080.png 1920x1080 67KB"
+  },
+  {
+   "at": "2026-10-19T09:38:14.079Z",
+   "msg": "页面 /engagement：title=\"Active Engagements | DefectDojo\" url=https://defectdojo.wans.heiyu.space/engagement 正文=385字"
+  },
+  {
+   "at": "2026-10-19T09:38:14.183Z",
+   "msg": "  shot pc-04-engagement-1920x1080.png 1920x1080 69KB"
+  },
+  {
+   "at": "2026-10-19T09:38:16.931Z",
+   "msg": "页面 /product/type：title=\"组织列表 | DefectDojo\" url=https://defectdojo.wans.heiyu.space/organization 正文=400字"
+  },
+  {
+   "at": "2026-10-19T09:38:17.030Z",
+   "msg": "  shot pc-05-product_type-1920x1080.png 1920x1080 83KB"
+  },
+  {
+   "at": "2026-10-19T09:38:20.411Z",
+   "msg": "  shot m-01-home-390x844.png 390x844 58KB"
+  },
+  {
+   "at": "2026-10-19T09:38:23.975Z",
+   "msg": "  shot m-02-findings-390x844.png 390x844 55KB"
+  }
+ ],
+ "console": [],
+ "shots": [
+  {
+   "file": "pc-02-home-1920x1080.png",
+   "w": 1920,
+   "h": 1080,
+   "bytes": 110956
+  },
+  {
+   "file": "pc-03-finding-1920x1080.png",
+   "w": 1920,
+   "h": 1080,
+   "bytes": 68910
+  },
+  {
+   "file": "pc-04-engagement-1920x1080.png",
+   "w": 1920,
+   "h": 1080,
+   "bytes": 70795
+  },
+  {
+   "file": "pc-05-product_type-1920x1080.png",
+   "w": 1920,
+   "h": 1080,
+   "bytes": 85337
+  },
+  {
+   "file": "m-01-home-390x844.png",
+   "w": 390,
+   "h": 844,
+   "bytes": 59870
+  },
+  {
+   "file": "m-02-findings-390x844.png",
+   "w": 390,
+   "h": 844,
+   "bytes": 56789
+  }
+ ],
+ "inject": {
+  "bridgeVersion": null,
+  "alreadyIntercepted": null,
+  "officialAnchorHook": false,
+  "pickerDefined": false,
+  "injectionFailedPage": false
+ },
+ "syntheticExport": {
+  "lastError": ""
+ },
+ "finishedAt": "2026-10-19T09:38:23.975Z",
+ "consoleErrors": 0
+}

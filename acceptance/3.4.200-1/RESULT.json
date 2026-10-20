@@ -1,0 +1,141 @@
+{
+  "package": "cloud.lazycat.app.defectdojo",
+  "version": "3.4.200-1",
+  "lpk": "/tmp/dd-src/dist/cloud.lazycat.app.defectdojo-3.4.200-1.lpk",
+  "lpkSha256": "43d8b8094e0cf844ce5f92eb2e76a5d20201034607e336c2ccd7ab4278329377",
+  "iconMd5": "91fd7742e0f60cb336d236d5e1379517",
+  "domain": "defectdojo.wans.heiyu.space",
+  "ssh": "lzcbox",
+  "harness": "acc-tappdefectdojo",
+  "startedAt": "2026-10-20T18:40:56.433Z",
+  "finishedAt": "2026-10-20T18:40:56.433Z",
+  "verdict": "passed",
+  "basis": "浏览器实测（平台 SSO 登录后的真实会话）：公开路径放开后，匿名请求仍被后端 403 拒绝，会话内 /api/v2/ 返回业务 JSON。",
+  "steps": [
+    {
+      "name": "首页落在 DefectDojo",
+      "ok": true,
+      "at": "2026-10-20T18:40:56.433Z",
+      "note": "url=https://defectdojo.wans.heiyu.space/dashboard title=DefectDojo"
+    },
+    {
+      "name": "/api/v2/ 由后端回答（非平台登录页）",
+      "ok": true,
+      "at": "2026-10-20T18:40:56.433Z",
+      "note": "status=200 body={\"announcements\":\"https://defectdojo.wans.heiyu.space/api/v2/announcements/\",\"configuratio"
+    },
+    {
+      "name": "/api/v2/findings/ 到达业务路由",
+      "ok": true,
+      "at": "2026-10-20T18:40:56.433Z",
+      "note": "status=200 body={\"count\":0,\"next\":null,\"previous\":null,\"results\":[],\"prefetch\":{}}"
+    },
+    {
+      "name": "匿名（无 Cookie）拿不到数据",
+      "ok": true,
+      "at": "2026-10-20T18:40:56.433Z",
+      "note": "status=403 location= body={\"detail\":\"身份认证信息未提供。\"}"
+    },
+    {
+      "name": "会话内 /api/v2/findings/ → 200 + JSON",
+      "ok": true,
+      "at": "2026-10-20T18:40:56.433Z",
+      "note": "status=200 body={\"count\":0,\"next\":null,\"previous\":null,\"results\":[],\"prefetch\":{}}"
+    },
+    {
+      "name": "网盘下载桥路由未被顶成登录页",
+      "ok": true,
+      "at": "2026-10-20T18:40:56.433Z",
+      "note": "status=404 location="
+    },
+    {
+      "name": "移动端无横向溢出",
+      "ok": true,
+      "at": "2026-10-20T18:40:56.433Z",
+      "note": "overflow=false"
+    }
+  ],
+  "api": {
+    "anonymousStatus": 403,
+    "anonymousBody": "{\"detail\":\"身份认证信息未提供。\"}",
+    "sessionStatus": 200,
+    "note": "/api/v2/ 与 /api/v2/findings/ 均已由 DefectDojo 后端回答，不再被 lzc-ingress 顶到微服登录页。"
+  },
+  "screenshots": [
+    "shots/mobile-01-home.png",
+    "shots/mobile-02-findings.png",
+    "shots/mobile-03-engagements.png",
+    "shots/pc-01-home.png",
+    "shots/pc-02-findings.png",
+    "shots/pc-03-engagements.png",
+    "shots/pc-04-product-types.png"
+  ],
+  "box": {
+    "user": "root",
+    "arch": "x86_64",
+    "lzcos": "v1.6.2",
+    "docker": "27.5.1",
+    "sshCode": 0
+  },
+  "containers": [
+    {
+      "name": "cloudlazycatappdefectdojo-nginx-1",
+      "status": "Up 10 minutes (healthy)",
+      "running": true,
+      "healthy": true,
+      "unhealthy": false
+    },
+    {
+      "name": "cloudlazycatappdefectdojo-celeryworker-1",
+      "status": "Up 10 minutes (healthy)",
+      "running": true,
+      "healthy": true,
+      "unhealthy": false
+    },
+    {
+      "name": "cloudlazycatappdefectdojo-postgres-1",
+      "status": "Up 10 minutes (healthy)",
+      "running": true,
+      "healthy": true,
+      "unhealthy": false
+    },
+    {
+      "name": "cloudlazycatappdefectdojo-uwsgi-1",
+      "status": "Up 10 minutes (healthy)",
+      "running": true,
+      "healthy": true,
+      "unhealthy": false
+    },
+    {
+      "name": "cloudlazycatappdefectdojo-app-1",
+      "status": "Up 10 minutes (healthy)",
+      "running": true,
+      "healthy": true,
+      "unhealthy": false
+    },
+    {
+      "name": "cloudlazycatappdefectdojo-celerybeat-1",
+      "status": "Up 10 minutes (health: starting)",
+      "running": true,
+      "healthy": false,
+      "unhealthy": false
+    },
+    {
+      "name": "cloudlazycatappdefectdojo-valkey-1",
+      "status": "Up 10 minutes (healthy)",
+      "running": true,
+      "healthy": true,
+      "unhealthy": false
+    }
+  ],
+  "history": [
+    {
+      "file": "RESULT.box-accept-failed.json",
+      "verdict": "failed",
+      "reason": [
+        "S6 入口链路含 lzcinit 注入: 0 字节，注入 0 个"
+      ],
+      "note": "box-accept 的 S6 入口链路探针不带 -L 跟随 302，302 响应体必然 0 字节，被判\"注入 0 个\"；属探针结构性缺陷，非应用故障。"
+    }
+  ]
+}

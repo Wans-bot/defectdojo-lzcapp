@@ -1,0 +1,119 @@
+{
+ "package": "cloud.lazycat.app.defectdojo",
+ "lpk": "/tmp/dd-src/dist/cloud.lazycat.app.defectdojo-3.4.200-1.lpk",
+ "lpkSha256": "43d8b8094e0cf844ce5f92eb2e76a5d20201034607e336c2ccd7ab4278329377",
+ "domain": "defectdojo.wans.heiyu.space",
+ "ssh": "lzcbox",
+ "harness": "acc-tappdefectdojo",
+ "startedAt": "2026-10-20T18:31:25.493Z",
+ "steps": [
+  {
+   "name": "S1 前置检查",
+   "ok": true,
+   "at": "2026-10-20T18:31:25.678Z",
+   "note": "lzcos v1.6.2 docker 27.5.1 sshCode 0"
+  },
+  {
+   "name": "S1 脚手架名合法",
+   "ok": true,
+   "at": "2026-10-20T18:31:25.679Z",
+   "note": "acc-tappdefectdojo"
+  },
+  {
+   "name": "S2 拆除同名脚手架",
+   "ok": true,
+   "at": "2026-10-20T18:31:25.865Z",
+   "note": "HARNESS_DOWN (acc-tappdefectdojo)"
+  },
+  {
+   "name": "S2/S3/S4 跳过安装",
+   "ok": true,
+   "at": "2026-10-20T18:31:25.865Z",
+   "note": "按 --skip-install 直接验收现有实例"
+  },
+  {
+   "name": "S5 容器就绪",
+   "ok": true,
+   "at": "2026-10-20T18:31:26.041Z",
+   "note": "7 个容器 Up，等待 0s"
+  },
+  {
+   "name": "S6 起 TLS 前置与 Chrome",
+   "ok": true,
+   "at": "2026-10-20T18:31:38.391Z",
+   "note": "CHROME_IP=172.28.3.3"
+  },
+  {
+   "name": "S6 入口链路含 lzcinit 注入",
+   "ok": false,
+   "at": "2026-10-20T18:31:38.564Z",
+   "note": "0 字节，注入 0 个"
+  }
+ ],
+ "verdict": "failed",
+ "box": {
+  "user": "root",
+  "arch": "x86_64",
+  "lzcos": "v1.6.2",
+  "docker": "27.5.1",
+  "sshCode": 0
+ },
+ "containers": [
+  {
+   "name": "cloudlazycatappdefectdojo-nginx-1",
+   "status": "Up 10 minutes (healthy)",
+   "running": true,
+   "healthy": true,
+   "unhealthy": false
+  },
+  {
+   "name": "cloudlazycatappdefectdojo-celeryworker-1",
+   "status": "Up 10 minutes (healthy)",
+   "running": true,
+   "healthy": true,
+   "unhealthy": false
+  },
+  {
+   "name": "cloudlazycatappdefectdojo-postgres-1",
+   "status": "Up 10 minutes (healthy)",
+   "running": true,
+   "healthy": true,
+   "unhealthy": false
+  },
+  {
+   "name": "cloudlazycatappdefectdojo-uwsgi-1",
+   "status": "Up 10 minutes (healthy)",
+   "running": true,
+   "healthy": true,
+   "unhealthy": false
+  },
+  {
+   "name": "cloudlazycatappdefectdojo-app-1",
+   "status": "Up 10 minutes (healthy)",
+   "running": true,
+   "healthy": true,
+   "unhealthy": false
+  },
+  {
+   "name": "cloudlazycatappdefectdojo-celerybeat-1",
+   "status": "Up 10 minutes (health: starting)",
+   "running": true,
+   "healthy": false,
+   "unhealthy": false
+  },
+  {
+   "name": "cloudlazycatappdefectdojo-valkey-1",
+   "status": "Up 10 minutes (healthy)",
+   "running": true,
+   "healthy": true,
+   "unhealthy": false
+  }
+ ],
+ "harnessChromeIp": "172.28.3.3",
+ "entry": {
+  "bytes": 0,
+  "injects": []
+ },
+ "failedStep": "S6 入口链路含 lzcinit 注入",
+ "finishedAt": "2026-10-20T18:31:38.565Z"
+}

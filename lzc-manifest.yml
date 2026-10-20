@@ -3,6 +3,10 @@ application:
   public_path:
     - /static/
     - /media/
+    # 评审 #20850：从盒子外调用 /api/v2/... 会被 lzc-ingress 拦到微服登录页。
+    # DefectDojo 的 API 自带 Token/会话鉴权，故只放通 /api 前缀，整站 / 仍受平台账号保护。
+    - /api/
+    - /api/v2/
   routes:
     - /=http://nginx.cloud.lazycat.app.defectdojo.lzcapp:8080
   health_check:
@@ -130,6 +134,16 @@ services:
       - LZ_READY_DIR=/lzcapp/var/ready
     binds:
       - /lzcapp/var/ready:/lzcapp/var/ready
+    healthcheck:
+      # 补 healthcheck：/__ready/ 由 content/nginx-entry.sh 注入，nginx 起来即 200、不依赖 uwsgi，
+      # 因此不会把 Django 迁移期误判成 nginx 不健康（镜像内已实测有 wget）。
+      test:
+        - CMD-SHELL
+        - 'wget -qO- http://127.0.0.1:8080/__ready/ | grep -q ok'
+      interval: 10s
+      timeout: 10s
+      retries: 30
+      start_period: 60s
   uwsgi:
     # upstream: docker.io/defectdojo/defectdojo-django:3.4.101
     image: registry.lazycat.cloud/wans/defectdojo/defectdojo-django:bd1b3c277f0fd2bd
@@ -195,6 +209,16 @@ services:
       - DD_ALLOWED_HOSTS=*
       - DD_LANGUAGE_CODE=zh-hans
       - TZ=Asia/Shanghai
+    healthcheck:
+      # beat 不响应 celery inspect，只能判进程存活（/proc/*/cmdline 找 celery beat）；
+      # 首启要等 DB + 迁移就绪，start_period 给足 10 分钟，避免把等待期算成失败。
+      test:
+        - CMD-SHELL
+        - 'for p in /proc/[0-9]*; do tr "\0" " " < $p/cmdline 2>/dev/null | grep -q "celery.*beat" && exit 0; done; exit 1'
+      interval: 30s
+      timeout: 10s
+      retries: 10
+      start_period: 600s
   celeryworker:
     # upstream: docker.io/defectdojo/defectdojo-django:3.4.101
     image: registry.lazycat.cloud/wans/defectdojo/defectdojo-django:bd1b3c277f0fd2bd
@@ -214,5 +238,15 @@ services:
       - DD_LANGUAGE_CODE=zh-hans
       - DD_CELERY_WORKER_POOL_TYPE=solo
       - TZ=Asia/Shanghai
+    healthcheck:
+      # 经 broker 广播 ping，没有 worker 应答就非 0（镜像内实测 `pong / 1 node online`）。
+      # 容器要等迁移完成才起得来，start_period 同样给足 10 分钟。
+      test:
+        - CMD-SHELL
+        - 'celery -A dojo inspect ping -t 10 >/dev/null 2>&1'
+      interval: 30s
+      timeout: 40s
+      retries: 20
+      start_period: 600s
     binds:
       - /lzcapp/var/media:/app/media

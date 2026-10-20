@@ -1,7 +1,7 @@
 name: DefectDojo
 description: 开源统一漏洞管理平台（DevSecOps / ASPM）：聚合各类扫描器的漏洞结果、自动去重、跟踪修复进度并输出统计报表
 package: cloud.lazycat.app.defectdojo
-version: 3.4.200
+version: 3.4.200-1
 author: DefectDojo
 license: BSD-3-Clause
 homepage: https://github.com/DefectDojo/django-DefectDojo

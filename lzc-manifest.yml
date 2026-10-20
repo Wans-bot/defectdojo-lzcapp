@@ -119,8 +119,8 @@ services:
     binds:
       - /lzcapp/var/valkey:/data
   nginx:
-    # upstream: docker.io/defectdojo/defectdojo-nginx:3.4.101
-    image: registry.lazycat.cloud/wans/defectdojo/defectdojo-nginx:921c9d7ec0207db7
+    # upstream: docker.io/defectdojo/defectdojo-nginx:3.4.200
+    image: registry.lazycat.cloud/wans/defectdojo/defectdojo-nginx:ac222f353afed217
     entrypoint: /bin/sh
     command: /lzcapp/pkg/content/nginx-entry.sh
     environment:

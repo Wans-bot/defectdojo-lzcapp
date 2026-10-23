@@ -1,7 +1,7 @@
 name: DefectDojo
 description: 开源统一漏洞管理平台（DevSecOps / ASPM）：聚合各类扫描器的漏洞结果、自动去重、跟踪修复进度并输出统计报表
 package: cloud.lazycat.app.defectdojo
-version: 3.4.200-1
+version: 3.4.202
 author: DefectDojo
 license: BSD-3-Clause
 homepage: https://github.com/DefectDojo/django-DefectDojo
@@ -56,6 +56,7 @@ locales:
       1. 右上角用户菜单 → API v2 Key：生成 API Token（也可用 /api/v2/api-token-auth/ 用账号密码换取）。
 
       2. 在 CI 流水线里调用上传接口，让扫描结果自动入库：
+
 
 
          curl -X POST "https://<你的子域名>/api/v2/import-scan/" \
@@ -143,6 +144,7 @@ locales:
       1. User menu -> API v2 Key to create an API token (or POST /api/v2/api-token-auth/ with username/password).
 
       2. Upload from your pipeline:
+
 
 
          curl -X POST "https://<your-subdomain>/api/v2/import-scan/" \

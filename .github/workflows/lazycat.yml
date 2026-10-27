@@ -82,9 +82,7 @@ jobs:
             if [ -z "${body}" ]; then
               text="${head}"
             else
-              text="${head}
-
-${body}"
+              text="$(printf '%s\n\n%s' "${head}" "${body}")"
             fi
           fi
           delim="LC_CHANGELOG"

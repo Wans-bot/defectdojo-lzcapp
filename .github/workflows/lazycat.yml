@@ -2,6 +2,10 @@ name: LazyCat LPK
 
 # 自动更新：定时检查上游新版本 → 改版本号 → 打包 → 发 Release（可选提交商店）。
 # 也可手动 workflow_dispatch，或推 v* tag 走 publish。
+#
+# changelog 口径（硬规则）：一律「同步上游最新版本 X + 上游该版本的更新说明」，
+# 由下面的 prepare 作业自动从上游 releases/latest 生成并透传给 action；
+# 该 changelog 同时用作 GitHub Release body 与商店审核的变更说明。
 on:
   push:
     tags:
@@ -9,6 +13,7 @@ on:
 
   schedule:
     - cron: "17 3 * * *"
+
   workflow_dispatch:
     inputs:
       operation:
@@ -20,6 +25,15 @@ on:
         description: "只演练，不写文件、不发布"
         type: boolean
         default: false
+      force:
+        description: "强制重发：跳过待审闸门，会取消上一张待审审核单"
+        type: boolean
+        default: false
+      changelog:
+        description: "手动指定 changelog（留空则自动取上游最新 Release 说明）"
+        type: string
+        required: false
+        default: ""
 
 permissions:
   contents: write
@@ -35,9 +49,56 @@ jobs:
       - id: check
         env:
           LZC_USER_TOKEN: ${{ secrets.LAZYCAT_TOKEN }}
+          REVIEW_GATE_FORCE: ${{ inputs.force || 'false' }}
         run: node ci/review-gate.mjs cloud.lazycat.app.defectdojo
+
+  prepare:
+    runs-on: ubuntu-latest
+    outputs:
+      changelog: ${{ steps.mk.outputs.changelog }}
+    steps:
+      - id: mk
+        shell: bash
+        env:
+          MANUAL: ${{ inputs.changelog }}
+          UPSTREAM: DefectDojo/django-DefectDojo
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          if [ -n "${MANUAL:-}" ]; then
+            text="${MANUAL}"
+          else
+            json="$(curl -fsSL -H "Authorization: Bearer ${GH_TOKEN}" \
+              -H "Accept: application/vnd.github+json" \
+              "https://api.github.com/repos/${UPSTREAM}/releases/latest" || echo '{}')"
+            tag="$(printf '%s' "${json}" | jq -r '.tag_name // empty' 2>/dev/null || true)"
+            body="$(printf '%s' "${json}" | jq -r '.body // empty' 2>/dev/null || true)"
+            if [ -n "${tag}" ]; then
+              head="同步上游最新版本 ${tag}。"
+            else
+              head="同步上游最新版本。"
+            fi
+            body="${body:0:1800}"
+            if [ -z "${body}" ]; then
+              text="${head}"
+            else
+              text="${head}
+
+${body}"
+            fi
+          fi
+          delim="LC_CHANGELOG"
+          while printf '%s' "${text}" | grep -Fxq "${delim}"; do delim="${delim}_x"; done
+          {
+            echo "changelog<<${delim}"
+            printf '%s\n' "${text}"
+            echo "${delim}"
+          } >> "${GITHUB_OUTPUT}"
+          echo "---- 将提交的 changelog ----"
+          printf '%s\n' "${text}"
+
   lazycat:
-    needs: gate
+    needs: [gate, prepare]
     if: needs.gate.outputs.skip != 'true'
     uses: ca-x/lazycat-github-action/.github/workflows/lazycat.yml@3dabca95f6eb0c3a6c4fc889631b13a055852912
     with:
@@ -45,5 +106,6 @@ jobs:
       config: .github/lazycat-action.yml
       dry-run: ${{ inputs.dry-run || false }}
       versioned-release-asset: true
+      changelog: ${{ needs.prepare.outputs.changelog }}
     secrets:
       LAZYCAT_TOKEN: ${{ secrets.LAZYCAT_TOKEN }}

@@ -13,6 +13,34 @@ update:
   version_source:
     type: image
     image: app
+  - id: django-uwsgi
+    target: service
+    service: uwsgi
+    source: docker.io/defectdojo/defectdojo-django
+    channel: stable
+    tag_regex: '^v?\d+\.\d+\.\d+$'
+    sort: semver
+    delivery:
+      mode: lazycat
+  - id: django-celerybeat
+    target: service
+    service: celerybeat
+    source: docker.io/defectdojo/defectdojo-django
+    channel: stable
+    tag_regex: '^v?\d+\.\d+\.\d+$'
+    sort: semver
+    delivery:
+      mode: lazycat
+  - id: django-celeryworker
+    target: service
+    service: celeryworker
+    source: docker.io/defectdojo/defectdojo-django
+    channel: stable
+    tag_regex: '^v?\d+\.\d+\.\d+$'
+    sort: semver
+    delivery:
+      mode: lazycat
+
 build:
   run_buildscript: false
 

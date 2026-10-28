@@ -135,11 +135,14 @@ services:
     binds:
       - /lzcapp/var/ready:/lzcapp/var/ready
     healthcheck:
-      # 补 healthcheck：/__ready/ 由 content/nginx-entry.sh 注入，nginx 起来即 200、不依赖 uwsgi，
-      # 因此不会把 Django 迁移期误判成 nginx 不健康（镜像内已实测有 wget）。
+      # /__ready/ 由 content/nginx-entry.sh 注入（镜像内已实测有 wget）。
+      # 语义分两段：迁移期返回 200；初始化完成后该端点改成真探一次上游（Django /login），
+      # 上游 3031 挂了返回 503 —— 所以这里只看「退出码/状态码」，不再 grep 固定文本：
+      # 一旦 grep -q ok，初始化完成后 body 是登录页，nginx 会被自己判成不健康。
       test:
         - CMD-SHELL
-        - 'wget -qO- http://127.0.0.1:8080/__ready/ | grep -q ok'
+        - 'wget -q -O /dev/null http://127.0.0.1:8080/__ready/'
+
       interval: 10s
       timeout: 10s
       retries: 30
@@ -209,16 +212,16 @@ services:
       - DD_ALLOWED_HOSTS=*
       - DD_LANGUAGE_CODE=zh-hans
       - TZ=Asia/Shanghai
-    healthcheck:
-      # beat 不响应 celery inspect，只能判进程存活（/proc/*/cmdline 找 celery beat）；
-      # 首启要等 DB + 迁移就绪，start_period 给足 10 分钟，避免把等待期算成失败。
-      test:
-        - CMD-SHELL
-        - 'for p in /proc/[0-9]*; do tr "\0" " " < $p/cmdline 2>/dev/null | grep -q "celery.*beat" && exit 0; done; exit 1'
-      interval: 30s
-      timeout: 10s
-      retries: 10
-      start_period: 600s
+    # 【有意不配 healthcheck】这是驳回 #20964 / #21110 / #21813「启动报错」的正解。
+    # lzcinit 会 "Standing by until other services are healthy"，只要本服务带探针：
+    # ① 平台 RUNNING 就被拖到迁移结束（实测 17s → 6.5min），审核侧看到的就是长时间无响应；
+    # ② 探针一旦判活失败（扫 /proc/*/cmdline 的假阴性、$p 被平台展开吃掉）就直接
+    #    unhealthy → 平台渲染「应用状态错误」。
+    # 3.4.101 正是靠「不给 celery* 配探针」稳定通过的；3.4.200 补了探针才回归。
+    # beat 自己有 db_ready 等待逻辑，不需要平台判活。
+    binds:
+      # 迁移完成标记由 uwsgi 服务写下，beat 靠它判断「可以启动了」，必须挂同一个卷
+      - /lzcapp/var/ready:/lzcapp/var/ready
   celeryworker:
     # upstream: docker.io/defectdojo/defectdojo-django:3.4.300
     image: registry.lazycat.cloud/wans/defectdojo/defectdojo-django:0a0bb8005021d34e
@@ -238,15 +241,7 @@ services:
       - DD_LANGUAGE_CODE=zh-hans
       - DD_CELERY_WORKER_POOL_TYPE=solo
       - TZ=Asia/Shanghai
-    healthcheck:
-      # 经 broker 广播 ping，没有 worker 应答就非 0（镜像内实测 `pong / 1 node online`）。
-      # 容器要等迁移完成才起得来，start_period 同样给足 10 分钟。
-      test:
-        - CMD-SHELL
-        - 'celery -A dojo inspect ping -t 10 >/dev/null 2>&1'
-      interval: 30s
-      timeout: 40s
-      retries: 20
-      start_period: 600s
+    # 【有意不配 healthcheck】同 celerybeat：`celery inspect ping` 要等迁移完成后
+    # 才应答，带上它等于把平台 RUNNING 和整体健康度绑死在迁移上，得不偿失。
     binds:
       - /lzcapp/var/media:/app/media

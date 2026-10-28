@@ -123,8 +123,8 @@ services:
     binds:
       - /lzcapp/var/valkey:/data
   nginx:
-    # upstream: docker.io/defectdojo/defectdojo-nginx:3.4.300
-    image: registry.lazycat.cloud/wans/defectdojo/defectdojo-nginx:b4eeafa416cd4606
+    # upstream: docker.io/defectdojo/defectdojo-nginx:3.4.301
+    image: registry.lazycat.cloud/wans/defectdojo/defectdojo-nginx:c7935bd975ec907b
     entrypoint: /bin/sh
     command: /lzcapp/pkg/content/nginx-entry.sh
     environment:
@@ -148,8 +148,8 @@ services:
       retries: 30
       start_period: 60s
   uwsgi:
-    # upstream: docker.io/defectdojo/defectdojo-django:3.4.300
-    image: registry.lazycat.cloud/wans/defectdojo/defectdojo-django:0a0bb8005021d34e
+    # upstream: docker.io/defectdojo/defectdojo-django:3.4.301
+    image: registry.lazycat.cloud/wans/defectdojo/defectdojo-django:ea3c65da8ab5c478
     entrypoint: /bin/bash
     command: /lzcapp/pkg/content/uwsgi-entry.sh
     user: root
@@ -195,8 +195,8 @@ services:
       - /lzcapp/var/media:/app/media
       - /lzcapp/var/ready:/lzcapp/var/ready
   celerybeat:
-    # upstream: docker.io/defectdojo/defectdojo-django:3.4.300
-    image: registry.lazycat.cloud/wans/defectdojo/defectdojo-django:0a0bb8005021d34e
+    # upstream: docker.io/defectdojo/defectdojo-django:3.4.301
+    image: registry.lazycat.cloud/wans/defectdojo/defectdojo-django:ea3c65da8ab5c478
     entrypoint: /bin/bash
     command: /lzcapp/pkg/content/celery-beat-entry.sh
     user: root
@@ -223,8 +223,8 @@ services:
       # 迁移完成标记由 uwsgi 服务写下，beat 靠它判断「可以启动了」，必须挂同一个卷
       - /lzcapp/var/ready:/lzcapp/var/ready
   celeryworker:
-    # upstream: docker.io/defectdojo/defectdojo-django:3.4.300
-    image: registry.lazycat.cloud/wans/defectdojo/defectdojo-django:0a0bb8005021d34e
+    # upstream: docker.io/defectdojo/defectdojo-django:3.4.301
+    image: registry.lazycat.cloud/wans/defectdojo/defectdojo-django:ea3c65da8ab5c478
     entrypoint: /bin/bash
     command: /lzcapp/pkg/content/celery-worker-entry.sh
     user: root

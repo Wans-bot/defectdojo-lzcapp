@@ -123,8 +123,8 @@ services:
     binds:
       - /lzcapp/var/valkey:/data
   nginx:
-    # upstream: docker.io/defectdojo/defectdojo-nginx:3.4.301
-    image: registry.lazycat.cloud/wans/defectdojo/defectdojo-nginx:c7935bd975ec907b
+    # upstream: docker.io/defectdojo/defectdojo-nginx:3.4.303
+    image: registry.lazycat.cloud/wans/defectdojo/defectdojo-nginx:5311ca5e5826d6f0
     entrypoint: /bin/sh
     command: /lzcapp/pkg/content/nginx-entry.sh
     environment:
@@ -142,14 +142,13 @@ services:
       test:
         - CMD-SHELL
         - 'wget -q -O /dev/null http://127.0.0.1:8080/__ready/'
-
       interval: 10s
       timeout: 10s
       retries: 30
       start_period: 60s
   uwsgi:
-    # upstream: docker.io/defectdojo/defectdojo-django:3.4.301
-    image: registry.lazycat.cloud/wans/defectdojo/defectdojo-django:ea3c65da8ab5c478
+    # upstream: docker.io/defectdojo/defectdojo-django:3.4.303
+    image: registry.lazycat.cloud/wans/defectdojo/defectdojo-django:bd049fdd00138be4
     entrypoint: /bin/bash
     command: /lzcapp/pkg/content/uwsgi-entry.sh
     user: root
@@ -195,8 +194,8 @@ services:
       - /lzcapp/var/media:/app/media
       - /lzcapp/var/ready:/lzcapp/var/ready
   celerybeat:
-    # upstream: docker.io/defectdojo/defectdojo-django:3.4.301
-    image: registry.lazycat.cloud/wans/defectdojo/defectdojo-django:ea3c65da8ab5c478
+    # upstream: docker.io/defectdojo/defectdojo-django:3.4.304
+    image: registry.lazycat.cloud/wans/defectdojo/defectdojo-django:6bf56e3fea6b2ee5
     entrypoint: /bin/bash
     command: /lzcapp/pkg/content/celery-beat-entry.sh
     user: root
@@ -223,8 +222,8 @@ services:
       # 迁移完成标记由 uwsgi 服务写下，beat 靠它判断「可以启动了」，必须挂同一个卷
       - /lzcapp/var/ready:/lzcapp/var/ready
   celeryworker:
-    # upstream: docker.io/defectdojo/defectdojo-django:3.4.301
-    image: registry.lazycat.cloud/wans/defectdojo/defectdojo-django:ea3c65da8ab5c478
+    # upstream: docker.io/defectdojo/defectdojo-django:3.4.304
+    image: registry.lazycat.cloud/wans/defectdojo/defectdojo-django:6bf56e3fea6b2ee5
     entrypoint: /bin/bash
     command: /lzcapp/pkg/content/celery-worker-entry.sh
     user: root

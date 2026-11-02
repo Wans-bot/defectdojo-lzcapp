@@ -123,8 +123,8 @@ services:
     binds:
       - /lzcapp/var/valkey:/data
   nginx:
-    # upstream: docker.io/defectdojo/defectdojo-nginx:3.4.303
-    image: registry.lazycat.cloud/wans/defectdojo/defectdojo-nginx:5311ca5e5826d6f0
+    # upstream: docker.io/defectdojo/defectdojo-nginx:3.4.304
+    image: registry.lazycat.cloud/wans/defectdojo/defectdojo-nginx:7fd01c6107ce15fe
     entrypoint: /bin/sh
     command: /lzcapp/pkg/content/nginx-entry.sh
     environment:
@@ -147,8 +147,8 @@ services:
       retries: 30
       start_period: 60s
   uwsgi:
-    # upstream: docker.io/defectdojo/defectdojo-django:3.4.303
-    image: registry.lazycat.cloud/wans/defectdojo/defectdojo-django:bd049fdd00138be4
+    # upstream: docker.io/defectdojo/defectdojo-django:3.4.304
+    image: registry.lazycat.cloud/wans/defectdojo/defectdojo-django:6bf56e3fea6b2ee5
     entrypoint: /bin/bash
     command: /lzcapp/pkg/content/uwsgi-entry.sh
     user: root
